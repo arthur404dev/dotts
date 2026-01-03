@@ -4,6 +4,7 @@ import (
 	"github.com/arthur404dev/dotts/internal/tui/components"
 	"github.com/arthur404dev/dotts/internal/tui/components/input"
 	"github.com/arthur404dev/dotts/internal/tui/keys"
+	"github.com/arthur404dev/dotts/internal/tui/app"
 	"github.com/arthur404dev/dotts/internal/tui/messages"
 	"github.com/arthur404dev/dotts/internal/tui/theme"
 	tea "github.com/charmbracelet/bubbletea"
@@ -86,7 +87,7 @@ func New(t *theme.Theme) *Wizard {
 }
 
 func (w *Wizard) ID() messages.PageID {
-	return messages.PageWizard
+	return app.PageWizard
 }
 
 func (w *Wizard) Title() string {

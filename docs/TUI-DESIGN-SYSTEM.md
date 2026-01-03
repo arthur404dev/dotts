@@ -2,6 +2,77 @@
 
 This document outlines the design system plan for the `dotts` TUI. Inspired by modern component libraries like shadcn/ui, this system aims to provide a robust, theme-aware, and highly composable set of building blocks for creating a polished and consistent terminal user interface.
 
+## 0. Framework Architecture (Vetru)
+
+The TUI is designed as a reusable framework called **Vetru** ("Next.js for TUIs"). The architecture separates framework code from application-specific code.
+
+### Package Structure
+
+```
+internal/tui/
+├── model.go              # Framework: Generic shell with Config-based DI
+├── keymap.go             # Framework: Default key bindings
+├── app.go                # App: dotts entry point, pages, commands, system detection
+├── app/
+│   └── pages.go          # App: PageID/ActionID constants (PageDashboard, PageWizard, etc.)
+│
+├── components/           # Framework: 35+ reusable components
+├── theme/                # Framework: Theme system (colors, spacing, icons)
+├── keys/                 # Framework: Centralized key binding definitions
+├── layout/               # Framework: Header, footer, overlay compositing
+├── messages/             # Framework: Generic message types
+├── palette/              # Framework: Command palette component
+├── progress/             # Framework: Progress tracking
+├── styles/               # Framework: Style utilities
+│
+├── pages/                # App: Page implementations
+│   ├── page.go           # Framework: Page interface definition
+│   ├── dashboard/        # App: Dashboard page
+│   ├── status/           # App: Status page
+│   └── ...
+└── wizard/               # App: Wizard step implementations
+```
+
+### Config-Based Dependency Injection
+
+The framework shell (`model.go`) accepts configuration via a `Config` struct:
+
+```go
+type Config struct {
+    Brand        string                         // App name (e.g., "dotts")
+    Version      string                         // App version
+    Theme        *theme.Theme                   // Optional custom theme
+    Pages        map[messages.PageID]pages.Page // Page implementations
+    Commands     []palette.Command              // Command palette commands
+    DefaultPage  messages.PageID                // Starting page
+    WizardPageID messages.PageID                // Wizard page (optional)
+    OnInit       func() tea.Msg                 // Initialization hook
+}
+```
+
+### Separation Rules
+
+| Package Type | Can Import | Cannot Import |
+|--------------|------------|---------------|
+| Framework (`components/`, `theme/`, `layout/`, etc.) | Other framework packages, external libs | `internal/system`, `internal/config`, app-specific code |
+| App (`app.go`, `app/`, `pages/*/`, `wizard/`) | Framework packages, dotts business logic | N/A |
+
+### Future: Standalone Vetru Package
+
+The framework code can be extracted to a standalone repository:
+
+```bash
+go get github.com/yourusername/vetru
+```
+
+With CLI tooling for scaffolding:
+
+```bash
+vetru init my-tui-app
+vetru add component spinner
+vetru add page settings
+```
+
 ## 1. Executive Summary
 
 **Goal**: Create a complete TUI design system inspired by shadcn/ui.

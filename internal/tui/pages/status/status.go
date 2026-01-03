@@ -2,6 +2,7 @@
 package status
 
 import (
+	"github.com/arthur404dev/dotts/internal/tui/app"
 	"github.com/arthur404dev/dotts/internal/tui/messages"
 	"github.com/arthur404dev/dotts/internal/tui/theme"
 	tea "github.com/charmbracelet/bubbletea"
@@ -20,7 +21,7 @@ func New(t *theme.Theme) *Status {
 	return &Status{theme: t}
 }
 
-func (s *Status) ID() messages.PageID                     { return messages.PageStatus }
+func (s *Status) ID() messages.PageID                     { return app.PageStatus }
 func (s *Status) Title() string                           { return "Status" }
 func (s *Status) SetSize(w, h int)                        { s.width, s.height = w, h }
 func (s *Status) Focus() tea.Cmd                          { return nil }

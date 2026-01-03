@@ -2,6 +2,7 @@
 package doctor
 
 import (
+	"github.com/arthur404dev/dotts/internal/tui/app"
 	"github.com/arthur404dev/dotts/internal/tui/messages"
 	"github.com/arthur404dev/dotts/internal/tui/theme"
 	tea "github.com/charmbracelet/bubbletea"
@@ -20,7 +21,7 @@ func New(t *theme.Theme) *Doctor {
 	return &Doctor{theme: t}
 }
 
-func (d *Doctor) ID() messages.PageID                     { return messages.PageDoctor }
+func (d *Doctor) ID() messages.PageID                     { return app.PageDoctor }
 func (d *Doctor) Title() string                           { return "Doctor" }
 func (d *Doctor) SetSize(w, h int)                        { d.width, d.height = w, h }
 func (d *Doctor) Focus() tea.Cmd                          { return nil }

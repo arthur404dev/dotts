@@ -3,6 +3,7 @@ package dashboard
 import (
 	"github.com/arthur404dev/dotts/internal/tui/components"
 	"github.com/arthur404dev/dotts/internal/tui/keys"
+	"github.com/arthur404dev/dotts/internal/tui/app"
 	"github.com/arthur404dev/dotts/internal/tui/messages"
 	"github.com/arthur404dev/dotts/internal/tui/theme"
 	tea "github.com/charmbracelet/bubbletea"
@@ -61,7 +62,7 @@ func New(t *theme.Theme) *Dashboard {
 }
 
 func (d *Dashboard) ID() messages.PageID {
-	return messages.PageDashboard
+	return app.PageDashboard
 }
 
 func (d *Dashboard) Title() string {

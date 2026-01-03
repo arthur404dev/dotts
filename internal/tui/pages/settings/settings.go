@@ -2,6 +2,7 @@
 package settings
 
 import (
+	"github.com/arthur404dev/dotts/internal/tui/app"
 	"github.com/arthur404dev/dotts/internal/tui/messages"
 	"github.com/arthur404dev/dotts/internal/tui/theme"
 	tea "github.com/charmbracelet/bubbletea"
@@ -20,7 +21,7 @@ func New(t *theme.Theme) *Settings {
 	return &Settings{theme: t}
 }
 
-func (s *Settings) ID() messages.PageID                     { return messages.PageSettings }
+func (s *Settings) ID() messages.PageID                     { return app.PageSettings }
 func (s *Settings) Title() string                           { return "Settings" }
 func (s *Settings) SetSize(w, h int)                        { s.width, s.height = w, h }
 func (s *Settings) Focus() tea.Cmd                          { return nil }

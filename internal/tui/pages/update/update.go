@@ -2,6 +2,7 @@
 package update
 
 import (
+	"github.com/arthur404dev/dotts/internal/tui/app"
 	"github.com/arthur404dev/dotts/internal/tui/messages"
 	"github.com/arthur404dev/dotts/internal/tui/theme"
 	tea "github.com/charmbracelet/bubbletea"
@@ -20,7 +21,7 @@ func New(t *theme.Theme) *Update {
 	return &Update{theme: t}
 }
 
-func (u *Update) ID() messages.PageID                     { return messages.PageUpdate }
+func (u *Update) ID() messages.PageID                     { return app.PageUpdate }
 func (u *Update) Title() string                           { return "Update" }
 func (u *Update) SetSize(w, h int)                        { u.width, u.height = w, h }
 func (u *Update) Focus() tea.Cmd                          { return nil }

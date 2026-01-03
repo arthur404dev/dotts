@@ -1,18 +1,9 @@
 package tui
 
 import (
-	"fmt"
-
-	"github.com/arthur404dev/dotts/internal/system"
 	"github.com/arthur404dev/dotts/internal/tui/layout"
 	"github.com/arthur404dev/dotts/internal/tui/messages"
 	"github.com/arthur404dev/dotts/internal/tui/pages"
-	"github.com/arthur404dev/dotts/internal/tui/pages/dashboard"
-	"github.com/arthur404dev/dotts/internal/tui/pages/doctor"
-	"github.com/arthur404dev/dotts/internal/tui/pages/settings"
-	"github.com/arthur404dev/dotts/internal/tui/pages/status"
-	"github.com/arthur404dev/dotts/internal/tui/pages/update"
-	"github.com/arthur404dev/dotts/internal/tui/pages/wizard"
 	"github.com/arthur404dev/dotts/internal/tui/palette"
 	"github.com/arthur404dev/dotts/internal/tui/theme"
 	"github.com/charmbracelet/bubbles/key"
@@ -21,8 +12,6 @@ import (
 	zone "github.com/lrstanley/bubblezone"
 )
 
-const Version = "0.1.0"
-
 type AppMode int
 
 const (
@@ -30,99 +19,124 @@ const (
 	ModeWizard
 )
 
-// Model is the root TUI model
+type Config struct {
+	Brand        string
+	Version      string
+	Theme        *theme.Theme
+	Pages        map[messages.PageID]pages.Page
+	Commands     []palette.Command
+	DefaultPage  messages.PageID
+	WizardPageID messages.PageID
+	OnInit       func() tea.Msg
+}
+
 type Model struct {
-	// Dimensions
 	width  int
 	height int
 
-	// Theme and styling
-	theme *theme.Theme
-
-	// Key bindings
+	config Config
+	theme  *theme.Theme
 	keymap KeyMap
 
-	// Layout components
 	header *layout.Header
 	footer *layout.Footer
 
-	// Navigation
 	activePageID messages.PageID
 	pages        map[messages.PageID]pages.Page
 
-	// Command palette
 	palette     *palette.Palette
 	paletteOpen bool
 
-	// System info
-	sysInfo *system.SystemInfo
+	metadata map[string]string
 
 	mode AppMode
 
-	// State
 	ready    bool
 	quitting bool
 }
 
-// NewModel creates a new root model
-func NewModel() *Model {
+func NewModel(cfg Config) *Model {
 	zone.NewGlobal()
 
-	t := theme.DefaultTheme()
+	t := cfg.Theme
+	if t == nil {
+		t = theme.DefaultTheme()
+	}
 	theme.SetCurrent(t)
 
 	km := DefaultKeyMap()
 
-	// Create layout components
-	header := layout.NewHeader(t, Version)
+	header := layout.NewHeader(t, cfg.Brand, cfg.Version)
 	footer := layout.NewFooter(t)
 	footer.SetKeyMap(km)
 
-	pageMap := map[messages.PageID]pages.Page{
-		messages.PageDashboard: dashboard.New(t),
-		messages.PageStatus:    status.New(t),
-		messages.PageUpdate:    update.New(t),
-		messages.PageDoctor:    doctor.New(t),
-		messages.PageSettings:  settings.New(t),
-		messages.PageWizard:    wizard.New(t),
+	commands := cfg.Commands
+	if len(commands) == 0 {
+		commands = []palette.Command{}
+	}
+	pal := palette.New(t, commands)
+
+	defaultPage := cfg.DefaultPage
+	if defaultPage == "" && len(cfg.Pages) > 0 {
+		for id := range cfg.Pages {
+			defaultPage = id
+			break
+		}
 	}
 
-	// Create palette
-	pal := palette.New(t, palette.DefaultCommands())
-
 	return &Model{
+		config:       cfg,
 		theme:        t,
 		keymap:       km,
 		header:       header,
 		footer:       footer,
-		activePageID: messages.PageDashboard,
-		pages:        pageMap,
+		activePageID: defaultPage,
+		pages:        cfg.Pages,
 		palette:      pal,
+		metadata:     make(map[string]string),
 	}
 }
 
-// Init initializes the model
+func (m *Model) SetMetadata(key, value string) {
+	m.metadata[key] = value
+	m.updateHeaderInfo()
+}
+
+func (m *Model) updateHeaderInfo() {
+	if len(m.metadata) == 0 {
+		return
+	}
+
+	var parts []string
+	for _, v := range m.metadata {
+		if v != "" {
+			parts = append(parts, v)
+		}
+	}
+
+	if len(parts) > 0 {
+		info := ""
+		for i, p := range parts {
+			if i > 0 {
+				info += " " + theme.Icons.Dot + " "
+			}
+			info += p
+		}
+		m.header.SetSysInfo(theme.Icons.Dot + " " + info)
+	}
+}
+
 func (m *Model) Init() tea.Cmd {
-	return tea.Batch(
-		m.detectSystem,
-		tea.EnterAltScreen,
-	)
-}
+	var cmds []tea.Cmd
+	cmds = append(cmds, tea.EnterAltScreen)
 
-func (m *Model) detectSystem() tea.Msg {
-	info, err := system.Detect()
-	if err != nil {
-		return systemDetectedMsg{err: err}
+	if m.config.OnInit != nil {
+		cmds = append(cmds, func() tea.Msg { return m.config.OnInit() })
 	}
-	return systemDetectedMsg{info: info}
+
+	return tea.Batch(cmds...)
 }
 
-type systemDetectedMsg struct {
-	info *system.SystemInfo
-	err  error
-}
-
-// Update handles events
 func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
@@ -130,13 +144,6 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.height = msg.Height
 		m.updateLayout()
 		m.ready = true
-		return m, nil
-
-	case systemDetectedMsg:
-		if msg.err == nil {
-			m.sysInfo = msg.info
-			m.updateSysInfo()
-		}
 		return m, nil
 
 	case tea.KeyMsg:
@@ -197,14 +204,12 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, m.palette.Focus()
 	}
 
-	// Route to palette if open
 	if m.paletteOpen {
 		var cmd tea.Cmd
 		m.palette, cmd = m.palette.Update(msg)
 		return m, cmd
 	}
 
-	// Route to current page
 	return m.updateCurrentPage(msg)
 }
 
@@ -226,9 +231,15 @@ func (m *Model) navigate(pageID messages.PageID) (*Model, tea.Cmd) {
 func (m *Model) startWizard() (*Model, tea.Cmd) {
 	m.mode = ModeWizard
 	m.paletteOpen = false
-	m.activePageID = messages.PageWizard
 
-	if page, ok := m.pages[messages.PageWizard]; ok {
+	wizardID := m.config.WizardPageID
+	if wizardID == "" {
+		return m, nil
+	}
+
+	m.activePageID = wizardID
+
+	if page, ok := m.pages[wizardID]; ok {
 		return m, page.Focus()
 	}
 
@@ -237,9 +248,9 @@ func (m *Model) startWizard() (*Model, tea.Cmd) {
 
 func (m *Model) endWizard(success bool) (*Model, tea.Cmd) {
 	m.mode = ModeNormal
-	m.activePageID = messages.PageDashboard
+	m.activePageID = m.config.DefaultPage
 
-	if page, ok := m.pages[messages.PageDashboard]; ok {
+	if page, ok := m.pages[m.config.DefaultPage]; ok {
 		return m, page.Focus()
 	}
 
@@ -261,59 +272,29 @@ func (m *Model) updateCurrentPage(msg tea.Msg) (*Model, tea.Cmd) {
 func (m *Model) updateLayout() {
 	headerHeight := 1
 	footerHeight := 1
-	contentHeight := m.height - headerHeight - footerHeight - 2 // padding
+	contentHeight := m.height - headerHeight - footerHeight - 2
 
 	m.header.SetWidth(m.width)
 	m.footer.SetWidth(m.width)
 	m.palette.SetWidth(min(60, m.width-4))
 
-	// Update all pages
 	for _, page := range m.pages {
 		page.SetSize(m.width-4, contentHeight)
 	}
 }
 
-func (m *Model) updateSysInfo() {
-	if m.sysInfo == nil {
-		return
-	}
-
-	info := fmt.Sprintf("%s %s %s %s",
-		theme.Icons.Dot,
-		m.sysInfo.OS,
-		theme.Icons.Dot,
-		m.sysInfo.Arch,
-	)
-	if m.sysInfo.Distro != "" && m.sysInfo.Distro != "unknown" {
-		info = fmt.Sprintf("%s %s %s %s %s %s",
-			theme.Icons.Dot,
-			m.sysInfo.OS,
-			theme.Icons.Dot,
-			m.sysInfo.Distro,
-			theme.Icons.Dot,
-			m.sysInfo.Arch,
-		)
-	}
-	m.header.SetSysInfo(info)
-}
-
-// View renders the model
 func (m *Model) View() string {
 	if !m.ready {
 		return "Loading..."
 	}
 
-	// Header
 	header := m.header.View()
 
-	// Content (current page)
 	page := m.pages[m.activePageID]
 	content := page.View()
 
-	// Footer
 	footer := m.footer.View()
 
-	// Compose main view
 	mainView := lipgloss.JoinVertical(
 		lipgloss.Left,
 		header,
@@ -321,7 +302,6 @@ func (m *Model) View() string {
 		footer,
 	)
 
-	// Overlay palette if open
 	if m.paletteOpen {
 		mainView = m.overlayPalette(mainView)
 	}
@@ -331,8 +311,6 @@ func (m *Model) View() string {
 
 func (m *Model) overlayPalette(base string) string {
 	paletteView := m.palette.View()
-
-	// Dim the background and overlay the palette
 	dimmed := layout.DimBackground(base)
 	return layout.CenterOverlay(paletteView, dimmed, m.width, m.height)
 }
