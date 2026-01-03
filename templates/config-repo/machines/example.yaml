@@ -1,0 +1,29 @@
+# Example machine configuration
+# Copy this file and rename to your machine's hostname
+
+machine:
+  hostname: example        # Must match your machine's hostname
+  description: Example machine configuration
+
+# Profiles to inherit (in order, later overrides earlier)
+# Choose based on your setup:
+#   - desktop: Multi-monitor Linux workstation
+#   - notebook: Single display Linux laptop
+#   - darwin: macOS machine
+inherits:
+  - desktop                # Change to notebook/darwin as needed
+
+# Machine-specific settings (override profile defaults)
+settings:
+  monitors: 2              # Override profile default
+  gpu: amd                 # nvidia, amd, or intel
+  theme: catppuccin-mocha  # Color scheme variant
+
+# Features to enable on this machine
+# See config.yaml for available features
+features:
+  - ssh
+  - github
+  - asdf
+  - docker
+  - gui

@@ -1,0 +1,77 @@
+# Git configuration
+# Managed by dotts - https://dotts.sh
+#
+# Set your identity in ~/.config/git/local (not tracked):
+#   [user]
+#       name = Your Name
+#       email = your@email.com
+
+[init]
+    defaultBranch = main
+
+[core]
+    editor = nvim
+    pager = delta
+    autocrlf = input
+    whitespace = fix
+
+[pull]
+    rebase = true
+
+[push]
+    default = current
+    autoSetupRemote = true
+
+[fetch]
+    prune = true
+
+[merge]
+    conflictstyle = diff3
+
+[diff]
+    colorMoved = default
+    algorithm = histogram
+
+[rebase]
+    autoStash = true
+
+# Delta (better diffs)
+[delta]
+    navigate = true
+    light = false
+    line-numbers = true
+    side-by-side = false
+    syntax-theme = Catppuccin-mocha
+
+[interactive]
+    diffFilter = delta --color-only
+
+# Aliases
+[alias]
+    s = status -sb
+    a = add
+    c = commit
+    p = push
+    pl = pull
+    co = checkout
+    b = branch
+    d = diff
+    ds = diff --staged
+    l = log --oneline -20
+    lg = log --graph --oneline --decorate
+    unstage = reset HEAD --
+    amend = commit --amend --no-edit
+    undo = reset --soft HEAD~1
+    wip = !git add -A && git commit -m 'WIP'
+    aliases = config --get-regexp alias
+
+# URL shortcuts
+[url "git@github.com:"]
+    insteadOf = gh:
+
+[url "git@gitlab.com:"]
+    insteadOf = gl:
+
+# Include local config (user identity, work overrides)
+[include]
+    path = ~/.config/git/local
