@@ -1,12 +1,15 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
 
+	"github.com/arthur404dev/dotts/internal/apply"
 	"github.com/arthur404dev/dotts/internal/state"
+	"github.com/arthur404dev/dotts/internal/tui/progress"
 	"github.com/arthur404dev/dotts/internal/tui/styles"
 	"github.com/arthur404dev/dotts/internal/tui/wizard"
 )
@@ -25,10 +28,21 @@ This command runs an interactive wizard that guides you through:
 	RunE: runInit,
 }
 
+var (
+	initSkipApply    bool
+	initDryRun       bool
+	initSkipPackages bool
+	initSkipDotfiles bool
+)
+
 func init() {
 	initCmd.Flags().String("source", "", "Config source URL (skip source selection)")
 	initCmd.Flags().String("machine", "", "Machine config name (skip machine selection)")
 	initCmd.Flags().Bool("no-auth", false, "Skip authentication setup")
+	initCmd.Flags().BoolVar(&initSkipApply, "skip-apply", false, "Skip package installation and dotfile linking")
+	initCmd.Flags().BoolVar(&initDryRun, "dry-run", false, "Show what would be done without making changes")
+	initCmd.Flags().BoolVar(&initSkipPackages, "skip-packages", false, "Skip package installation")
+	initCmd.Flags().BoolVar(&initSkipDotfiles, "skip-dotfiles", false, "Skip dotfile linking")
 }
 
 func runInit(cmd *cobra.Command, args []string) error {
@@ -74,18 +88,55 @@ func runInit(cmd *cobra.Command, args []string) error {
 		fmt.Println(styles.StatusLine(styles.SuccessIcon, "Features", fmt.Sprintf("%v", result.Features.Features)))
 	}
 
+	if initSkipApply {
+		fmt.Println()
+		fmt.Println(styles.Success("Configuration saved!"))
+		fmt.Println()
+		fmt.Println(styles.Info("Next steps:"))
+		fmt.Println(styles.Mute("  1. Run 'dotts update' to apply your configuration"))
+		fmt.Println(styles.Mute("  2. Run 'dotts doctor' to verify your setup"))
+		return nil
+	}
+
+	configPath := getConfigPath(result.Source)
+	machineName := getMachineName(result.Machine)
+
+	applier, err := apply.New(wiz.GetSystemInfo(), configPath)
+	if err != nil {
+		return fmt.Errorf("failed to initialize applier: %w", err)
+	}
+
+	applyResult, err := applier.Apply(context.Background(), apply.ApplyOptions{
+		DryRun:       initDryRun,
+		SkipPackages: initSkipPackages,
+		SkipDotfiles: initSkipDotfiles,
+		MachineName:  machineName,
+	})
+	if err != nil {
+		return fmt.Errorf("failed to apply configuration: %w", err)
+	}
+
 	fmt.Println()
-	fmt.Println(styles.Success("Configuration saved!"))
-	fmt.Println()
-	fmt.Println(styles.Info("Next steps:"))
-	fmt.Println(styles.Mute("  1. Run 'dotts update' to apply your configuration"))
-	fmt.Println(styles.Mute("  2. Run 'dotts doctor' to verify your setup"))
+	if applyResult.Success() {
+		progress.PrintSuccess("Setup complete!")
+	} else {
+		progress.PrintWarning(fmt.Sprintf("Setup completed with %d error(s)", len(applyResult.Errors)))
+		for _, e := range applyResult.Errors {
+			progress.PrintError(e.Error())
+		}
+	}
 
 	if result.Auth.SetupSSH || result.Auth.SetupGitHub || result.Auth.SetupDoppler {
 		fmt.Println()
 		fmt.Println(styles.Warn("Authentication setup requested but not yet implemented."))
 		fmt.Println(styles.Mute("This will be available in a future version."))
 	}
+
+	fmt.Println()
+	fmt.Println(styles.Info("Useful commands:"))
+	fmt.Println(styles.Mute("  dotts status  - Show current configuration state"))
+	fmt.Println(styles.Mute("  dotts update  - Update packages and dotfiles"))
+	fmt.Println(styles.Mute("  dotts doctor  - Verify your setup"))
 
 	return nil
 }
@@ -111,6 +162,21 @@ func getMachineDescription(machine *wizard.MachineResult) string {
 		return fmt.Sprintf("Existing: %s", machine.ExistingName)
 	}
 	return fmt.Sprintf("%s (%s)", machine.Name, machine.Type)
+}
+
+func getConfigPath(source *wizard.SourceResult) string {
+	if source.IsLocal || source.Type == wizard.SourceTypeFork {
+		return source.LocalPath
+	}
+	paths := state.GetPaths()
+	return paths.ConfigRepo
+}
+
+func getMachineName(machine *wizard.MachineResult) string {
+	if machine.UseExisting {
+		return machine.ExistingName
+	}
+	return machine.Name
 }
 
 func fileExists(path string) bool {
