@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/arthur404dev/dotts/internal/tui"
 	"github.com/spf13/cobra"
 )
 
@@ -31,12 +32,19 @@ Features:
   • Smart updates with diff preview
 
 Get started:
-  dotts init          Bootstrap a new system
+  dotts               Launch interactive TUI
+  dotts init          Bootstrap a new system (CLI mode)
   dotts update        Update configs and packages
   dotts status        Show current state
 
 Documentation: https://dotts.sh/docs`,
 	Version: Version,
+	Run: func(cmd *cobra.Command, args []string) {
+		if err := tui.Run(); err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
+		}
+	},
 }
 
 func Execute() error {
