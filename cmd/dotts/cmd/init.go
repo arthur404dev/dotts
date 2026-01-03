@@ -144,7 +144,7 @@ func runInit(cmd *cobra.Command, args []string) error {
 func getSourceDescription(source *wizard.SourceResult) string {
 	switch source.Type {
 	case wizard.SourceTypeDefault:
-		return "Default (arthur404dev/dotts-config)"
+		return "Default (arthur404dev/dotfiles)"
 	case wizard.SourceTypeFork:
 		return fmt.Sprintf("New local config at %s", source.LocalPath)
 	case wizard.SourceTypeCustom:

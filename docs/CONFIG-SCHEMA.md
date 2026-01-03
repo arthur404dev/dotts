@@ -5,7 +5,7 @@
 ## Repository Structure
 
 ```
-dotts-config/
+dotfiles/
 ├── config.yaml           # Repository metadata
 ├── profiles/             # Profile definitions
 │   ├── base.yaml

@@ -9,7 +9,7 @@
 Unlike chezmoi or YADM where configs live inside the tool's structure, dotts keeps them separate:
 
 - **dotts** (this repo): The CLI tool, installable via single binary
-- **dotts-config** (user repo): The configuration repository, forkable and customizable
+- **dotfiles** (user repo): The configuration repository, forkable and customizable
 
 This allows:
 - Sharing configs without requiring others to understand the tool internals

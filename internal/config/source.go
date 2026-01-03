@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	DefaultConfigRepo = "https://github.com/arthur404dev/dotts-config"
+	DefaultConfigRepo = "https://github.com/arthur404dev/dotfiles"
 	DefaultBranch     = "main"
 )
 

@@ -54,7 +54,7 @@ Create a tool that:
 
 **Implementation**:
 - `dotts` (CLI) is installed system-wide
-- `dotts-config` (configs) lives in user's repo
+- `dotfiles` (configs) lives in user's repo
 - Three source options: default, fork template, custom URL
 
 ### Decision 2: Profile-Based Inheritance
@@ -212,7 +212,7 @@ Continue building the dotts CLI project at ~/software-development/dotts/
 This is a Universal Dotfiles Manager with:
 - Go CLI using Cobra + Charm (huh, bubbletea, lipgloss)
 - Nix Home Manager as planned backend for dotfile management
-- Separated CLI (dotts) and config repo (dotts-config)
+- Separated CLI (dotts) and config repo (dotfiles)
 - Alternate files pattern (##os.Darwin, ##profile.desktop) for machine-specific configs
 - Interactive TUI wizard for bootstrap
 

@@ -30,7 +30,7 @@ dotts init
 
 ```
 ┌─────────────────────────┐     ┌─────────────────────────┐
-│       dotts (CLI)       │     │  dotts-config (Yours)   │
+│       dotts (CLI)       │     │    dotfiles (Yours)     │
 │                         │     │                         │
 │  • System detection     │ ──► │  • profiles/            │
 │  • Package installation │     │  • packages/            │
@@ -81,7 +81,7 @@ kitty.conf##hostname.workstation # Specific machine
 ### Repository Structure
 
 ```
-your-dotts-config/
+your-dotfiles/
 ├── config.yaml           # Repo metadata
 ├── profiles/             # Profile definitions
 │   ├── base.yaml

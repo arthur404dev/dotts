@@ -39,7 +39,7 @@ func RunSourceWizard() (*SourceResult, error) {
 			huh.NewSelect[string]().
 				Title("Where should dotts get your configurations from?").
 				Options(
-					huh.NewOption("Use default configs (arthur404dev/dotts-config)", "default").Selected(true),
+					huh.NewOption("Use default configs (arthur404dev/dotfiles)", "default").Selected(true),
 					huh.NewOption("Start fresh with a template", "fork"),
 					huh.NewOption("Use my existing config repo", "custom"),
 				).
@@ -65,7 +65,7 @@ func RunSourceWizard() (*SourceResult, error) {
 
 func handleDefaultSource() (*SourceResult, error) {
 	fmt.Println()
-	fmt.Println(styles.Info("Using default configuration from arthur404dev/dotts-config"))
+	fmt.Println(styles.Info("Using default configuration from arthur404dev/dotfiles"))
 
 	return &SourceResult{
 		Type: SourceTypeDefault,
@@ -75,7 +75,7 @@ func handleDefaultSource() (*SourceResult, error) {
 
 func handleForkSource() (*SourceResult, error) {
 	home, _ := os.UserHomeDir()
-	defaultPath := filepath.Join(home, "dotts-config")
+	defaultPath := filepath.Join(home, "dotfiles")
 
 	var (
 		localPath string
@@ -147,7 +147,7 @@ func handleCustomSource() (*SourceResult, error) {
 				Title("Enter your config repo URL").
 				Description("Supports GitHub URLs, git@ SSH URLs, or local paths").
 				Value(&url).
-				Placeholder("https://github.com/username/my-dotts-config").
+				Placeholder("https://github.com/username/dotfiles").
 				Validate(func(s string) error {
 					if s == "" {
 						return fmt.Errorf("URL is required")

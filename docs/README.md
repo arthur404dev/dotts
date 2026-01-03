@@ -60,7 +60,7 @@ dotts init
 └─────────────────────────────────────────────────────────────────┘
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                    dotts-config (Your Configs)                  │
+│                      dotfiles (Your Configs)                    │
 │  - Profile definitions (base, linux, darwin, desktop, notebook) │
 │  - Package manifests (nix, arch, darwin)                        │
 │  - Machine-specific settings                                    │

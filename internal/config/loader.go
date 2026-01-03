@@ -26,7 +26,7 @@ func (l *Loader) LoadRepoConfig() (*schema.RepoConfig, error) {
 	if err != nil {
 		if os.IsNotExist(err) {
 			return &schema.RepoConfig{
-				Name:    "dotts-config",
+				Name:    "dotfiles",
 				Version: "1.0.0",
 			}, nil
 		}

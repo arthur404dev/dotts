@@ -141,7 +141,7 @@ internal/tui/progress/
 dotts status
 ============
 
-Config Source: git@github.com:user/dotts-config.git (main)
+Config Source: git@github.com:user/dotfiles.git (main)
 Last Updated:  2026-01-02 10:30:00
 
 Machine:       workstation
