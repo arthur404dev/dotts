@@ -1,0 +1,41 @@
+# Arch Linux packages
+# System packages that should be installed via pacman/yay
+
+# System packages (pacman)
+system:
+  arch:
+    # Base development
+    - base-devel
+    - git
+    - openssh
+
+    # Filesystem
+    - ntfs-3g
+    - exfat-utils
+
+    # Networking
+    - networkmanager
+    - nm-connection-editor
+
+    # Audio
+    - pipewire
+    - pipewire-pulse
+    - wireplumber
+    - pavucontrol
+
+    # Fonts
+    - ttf-jetbrains-mono-nerd
+    - ttf-firacode-nerd
+    - noto-fonts
+    - noto-fonts-emoji
+
+    # GUI essentials (when gui feature enabled)
+    - kitty
+    - firefox
+
+# AUR packages (yay)
+aur:
+  - yay-bin          # AUR helper itself
+  - visual-studio-code-bin
+  - spotify
+  - 1password

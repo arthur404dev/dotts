@@ -1,0 +1,46 @@
+# macOS packages
+# Installed via Homebrew
+
+# Homebrew formulae (CLI tools)
+brew:
+  # Already in common.yaml via nix, but brew versions if preferred:
+  # - git
+  # - ripgrep
+  # - fd
+
+  # macOS-specific CLI tools
+  - mas           # Mac App Store CLI
+  - duti          # Set default applications
+  - trash         # Move to trash instead of rm
+
+# Homebrew casks (GUI applications)
+cask:
+  # Terminals
+  - kitty
+  - wezterm
+
+  # Browsers
+  - firefox
+  - arc
+
+  # Development
+  - visual-studio-code
+  - docker
+
+  # Productivity
+  - raycast
+  - 1password
+  - rectangle     # Window management
+  - karabiner-elements
+
+  # Communication
+  - slack
+  - discord
+
+  # Media
+  - spotify
+  - vlc
+
+# System packages (for compatibility)
+system:
+  darwin: []

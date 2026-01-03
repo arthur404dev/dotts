@@ -1,0 +1,24 @@
+# Notebook profile - for laptops and portable machines
+# Optimized for single display and battery efficiency
+
+name: notebook
+description: Laptop/notebook with single display
+
+inherits:
+  - linux
+
+configs:
+  - terminal
+
+settings:
+  monitors: 1
+  gpu: intel            # Usually integrated graphics
+  compositor: hyprland
+  bar: waybar
+  # Power management
+  power_profile: balanced
+  screen_timeout: 300   # 5 minutes
+
+scripts:
+  post_install:
+    - scripts/setup-notebook.sh

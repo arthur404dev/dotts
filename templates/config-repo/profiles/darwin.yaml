@@ -1,0 +1,24 @@
+# Darwin/macOS profile
+# Inherits from base and adds macOS-specific configurations
+
+name: darwin
+description: macOS-specific configurations
+
+inherits:
+  - base
+
+configs:
+  - tools
+
+packages:
+  - darwin
+
+settings:
+  terminal: kitty
+  # macOS-specific settings
+  dock_autohide: true
+  finder_show_extensions: true
+
+scripts:
+  post_install:
+    - scripts/macos-defaults.sh

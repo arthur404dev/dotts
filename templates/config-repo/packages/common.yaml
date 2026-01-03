@@ -1,0 +1,35 @@
+# Common packages - cross-platform essentials
+# These are installed on all systems regardless of OS
+
+# Nix packages (preferred, works everywhere)
+nix:
+  # Core utilities
+  - coreutils
+  - curl
+  - wget
+  - git
+  - ripgrep
+  - fd
+  - fzf
+  - jq
+  - yq
+  - bat
+  - eza           # Modern ls replacement
+  - zoxide        # Smart cd
+
+  # Shell
+  - fish
+  - starship      # Cross-shell prompt
+
+  # Editor
+  - neovim
+
+  # Development
+  - gh            # GitHub CLI
+  - lazygit
+  - delta         # Git diff viewer
+
+# asdf version manager plugins and default versions
+asdf:
+  nodejs: "lts"
+  python: "latest"

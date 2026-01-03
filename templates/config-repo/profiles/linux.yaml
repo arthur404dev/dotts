@@ -1,0 +1,17 @@
+# Linux profile - base for all Linux distributions
+# Inherits from base and adds Linux-specific configurations
+
+name: linux
+description: Linux-specific configurations
+
+inherits:
+  - base
+
+configs:
+  - tools      # Linux CLI tools (btop, etc.)
+
+packages:
+  - arch       # Or debian/fedora depending on distro
+
+settings:
+  terminal: kitty

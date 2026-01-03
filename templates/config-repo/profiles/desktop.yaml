@@ -1,0 +1,21 @@
+# Desktop profile - for multi-monitor workstations
+# Used for powerful desktop machines with multiple displays
+
+name: desktop
+description: Desktop workstation with multiple monitors
+
+inherits:
+  - linux
+
+configs:
+  - terminal
+
+settings:
+  monitors: 3           # Number of monitors (used for WM config)
+  gpu: nvidia           # GPU vendor (nvidia, amd, intel)
+  compositor: hyprland  # Window manager/compositor
+  bar: waybar           # Status bar
+
+scripts:
+  post_install:
+    - scripts/setup-desktop.sh

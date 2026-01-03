@@ -1,0 +1,26 @@
+# Base profile - inherited by all other profiles
+# Contains universal configurations that work across all platforms
+
+name: base
+description: Universal base configuration for all systems
+
+# Config directories to symlink (relative to configs/)
+configs:
+  - shell
+  - git
+  - editor
+
+# Package groups to install (relative to packages/)
+packages:
+  - common
+
+# Settings that can be overridden by inheriting profiles
+settings:
+  shell: fish           # Default shell (fish, zsh, bash)
+  editor: nvim          # Default editor (nvim, vim, code)
+  theme: catppuccin     # Color scheme theme
+
+# Lifecycle scripts
+scripts:
+  post_install:
+    - scripts/setup-shell.sh

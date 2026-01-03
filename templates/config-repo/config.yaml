@@ -1,0 +1,23 @@
+# dotts configuration repository
+# This file defines metadata about your dotfiles configuration
+
+name: my-dotfiles
+author: ""  # Your name or GitHub username
+description: Personal dotfiles managed by dotts
+version: "1.0.0"
+
+# Default machine to use when hostname doesn't match any machine file
+default_machine: example
+
+# Available features that can be enabled per-machine
+# These affect which optional configurations and packages get installed
+features:
+  - ssh        # SSH key generation and configuration
+  - gpg        # GPG key setup
+  - github     # GitHub CLI authentication
+  - asdf       # asdf version manager for languages
+  - docker     # Docker/container tooling
+  - gui        # GUI applications (terminals, editors with GUI, etc.)
+
+# Minimum dotts version required for this config
+min_dotts_version: "0.1.0"
