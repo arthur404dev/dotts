@@ -77,11 +77,16 @@ func runInit(cmd *cobra.Command, args []string) error {
 	fmt.Println(styles.StatusLine(styles.SuccessIcon, "Config Source", getSourceDescription(result.Source)))
 	fmt.Println(styles.StatusLine(styles.SuccessIcon, "Machine", getMachineDescription(result.Machine)))
 
+	if result.Personal != nil {
+		fmt.Println(styles.StatusLine(styles.SuccessIcon, "Name", result.Personal.Name))
+		fmt.Println(styles.StatusLine(styles.SuccessIcon, "Email", result.Personal.Email))
+		if result.Personal.GitHub != "" {
+			fmt.Println(styles.StatusLine(styles.SuccessIcon, "GitHub", result.Personal.GitHub))
+		}
+	}
+
 	if result.Settings != nil {
 		fmt.Println(styles.StatusLine(styles.SuccessIcon, "Monitors", fmt.Sprintf("%d", result.Settings.Monitors)))
-		if result.Settings.GitEmail != "" {
-			fmt.Println(styles.StatusLine(styles.SuccessIcon, "Git Email", result.Settings.GitEmail))
-		}
 	}
 
 	if len(result.Features.Features) > 0 {

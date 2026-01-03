@@ -13,6 +13,7 @@ import (
 type WizardResult struct {
 	Source   *SourceResult
 	Machine  *MachineResult
+	Personal *PersonalResult
 	Settings *SettingsResult
 	Features *FeaturesResult
 	Auth     *AuthResult
@@ -67,6 +68,12 @@ func (w *Wizard) Run() (*WizardResult, error) {
 		return nil, fmt.Errorf("machine wizard failed: %w", err)
 	}
 	result.Machine = machineResult
+
+	personalResult, err := RunPersonalWizard(w.sysInfo)
+	if err != nil {
+		return nil, fmt.Errorf("personal wizard failed: %w", err)
+	}
+	result.Personal = personalResult
 
 	var machineType MachineType
 	if machineResult.UseExisting {
@@ -167,8 +174,6 @@ func (w *Wizard) updateState(result *WizardResult, configPath string) {
 
 	if result.Settings != nil {
 		w.state.SetSetting("monitors", result.Settings.Monitors)
-		w.state.SetSetting("git_email", result.Settings.GitEmail)
-		w.state.SetSetting("git_name", result.Settings.GitName)
 	}
 
 	for _, feature := range result.Features.Features {

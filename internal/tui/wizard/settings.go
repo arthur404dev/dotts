@@ -12,19 +12,13 @@ import (
 
 type SettingsResult struct {
 	Monitors int
-	GitEmail string
-	GitName  string
 }
 
 func RunSettingsWizard(machineType MachineType, sysInfo *system.SystemInfo) (*SettingsResult, error) {
 	fmt.Println()
 	fmt.Println(styles.Title("Configuration Settings"))
 
-	var (
-		monitorsStr string
-		gitEmail    string
-		gitName     string
-	)
+	var monitorsStr string
 
 	defaultMonitors := "1"
 	if machineType == MachineTypeDesktop {
@@ -56,25 +50,9 @@ func RunSettingsWizard(machineType MachineType, sysInfo *system.SystemInfo) (*Se
 		))
 	}
 
-	groups = append(groups, huh.NewGroup(
-		huh.NewInput().
-			Title("Git email for commits").
-			Value(&gitEmail).
-			Placeholder("you@example.com").
-			Validate(func(s string) error {
-				if s == "" {
-					return nil
-				}
-				if !isValidEmail(s) {
-					return fmt.Errorf("invalid email format")
-				}
-				return nil
-			}),
-		huh.NewInput().
-			Title("Git name").
-			Value(&gitName).
-			Placeholder(sysInfo.Username),
-	))
+	if len(groups) == 0 {
+		return &SettingsResult{Monitors: 1}, nil
+	}
 
 	form := huh.NewForm(groups...).WithTheme(styles.GetHuhTheme())
 
@@ -87,14 +65,8 @@ func RunSettingsWizard(machineType MachineType, sysInfo *system.SystemInfo) (*Se
 		monitors, _ = strconv.Atoi(monitorsStr)
 	}
 
-	if gitName == "" {
-		gitName = sysInfo.Username
-	}
-
 	return &SettingsResult{
 		Monitors: monitors,
-		GitEmail: gitEmail,
-		GitName:  gitName,
 	}, nil
 }
 

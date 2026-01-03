@@ -15,10 +15,11 @@ type Linker interface {
 }
 
 type LinkEntry struct {
-	Source    string    `json:"source"`
-	Target    string    `json:"target"`
-	CreatedAt time.Time `json:"created_at"`
-	IsDir     bool      `json:"is_dir"`
+	Source     string    `json:"source"`
+	Target     string    `json:"target"`
+	CreatedAt  time.Time `json:"created_at"`
+	IsDir      bool      `json:"is_dir"`
+	IsTemplate bool      `json:"is_template,omitempty"`
 }
 
 type LinkStatus struct {
@@ -71,10 +72,11 @@ const (
 type ProgressCallback func(progress LinkProgress)
 
 type LinkOptions struct {
-	DryRun   bool
-	Force    bool
-	Backup   bool
-	Progress ProgressCallback
+	DryRun         bool
+	Force          bool
+	Backup         bool
+	Progress       ProgressCallback
+	TemplateValues map[string]string
 }
 
 func DefaultLinkOptions() LinkOptions {

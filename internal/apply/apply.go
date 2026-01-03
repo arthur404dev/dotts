@@ -7,6 +7,7 @@ import (
 	"github.com/arthur404dev/dotts/internal/config"
 	"github.com/arthur404dev/dotts/internal/installer"
 	"github.com/arthur404dev/dotts/internal/linker"
+	"github.com/arthur404dev/dotts/internal/personal"
 	"github.com/arthur404dev/dotts/internal/state"
 	"github.com/arthur404dev/dotts/internal/system"
 	"github.com/arthur404dev/dotts/internal/tui/progress"
@@ -104,6 +105,7 @@ func (a *Applier) Apply(ctx context.Context, opts ApplyOptions) (*ApplyResult, e
 
 		linkOpts := linker.DefaultLinkOptions()
 		linkOpts.DryRun = opts.DryRun
+		linkOpts.TemplateValues = a.loadTemplateValues()
 
 		for _, configName := range resolved.Configs {
 			linkResult, err := a.linker.LinkConfig(configName, linkOpts)
@@ -215,4 +217,12 @@ func (a *Applier) GetLoader() *config.Loader {
 
 func (a *Applier) GetLinker() *linker.SymlinkLinker {
 	return a.linker
+}
+
+func (a *Applier) loadTemplateValues() map[string]string {
+	personalConfig, err := personal.Load()
+	if err != nil {
+		return nil
+	}
+	return personalConfig.ToMap()
 }

@@ -4,6 +4,8 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/arthur404dev/dotts/internal/template"
 )
 
 type SymlinkLinker struct {
@@ -108,19 +110,25 @@ func (s *SymlinkLinker) shouldLinkAsDirectory(dirPath, sourceRoot string) bool {
 }
 
 func (s *SymlinkLinker) createLink(source, target string, isDir bool, opts LinkOptions, result *LinkResult) error {
+	isTemplate := false
+	if !isDir && len(opts.TemplateValues) > 0 {
+		isTemplate = s.hasTemplates(source)
+	}
+
 	if opts.DryRun {
 		result.Linked = append(result.Linked, LinkEntry{
-			Source:    source,
-			Target:    target,
-			CreatedAt: time.Now(),
-			IsDir:     isDir,
+			Source:     source,
+			Target:     target,
+			CreatedAt:  time.Now(),
+			IsDir:      isDir,
+			IsTemplate: isTemplate,
 		})
 		return nil
 	}
 
 	if isSymlink(target) {
 		existingSource, err := readLink(target)
-		if err == nil && existingSource == source {
+		if err == nil && existingSource == source && !isTemplate {
 			result.Skipped = append(result.Skipped, target)
 			return nil
 		}
@@ -129,11 +137,13 @@ func (s *SymlinkLinker) createLink(source, target string, isDir bool, opts LinkO
 			if err := os.Remove(target); err != nil {
 				return err
 			}
-		} else {
+		} else if !isTemplate {
 			result.Skipped = append(result.Skipped, target)
 			return nil
 		}
-	} else if pathExists(target) {
+	}
+
+	if pathExists(target) {
 		if opts.Backup {
 			backupPath, err := s.backup.Backup(target)
 			if err != nil {
@@ -151,20 +161,51 @@ func (s *SymlinkLinker) createLink(source, target string, isDir bool, opts LinkO
 		return err
 	}
 
-	if err := os.Symlink(source, target); err != nil {
-		return err
+	if isTemplate {
+		if err := s.applyTemplate(source, target, opts.TemplateValues); err != nil {
+			return err
+		}
+	} else {
+		if err := os.Symlink(source, target); err != nil {
+			return err
+		}
 	}
 
 	entry := LinkEntry{
-		Source:    source,
-		Target:    target,
-		CreatedAt: time.Now(),
-		IsDir:     isDir,
+		Source:     source,
+		Target:     target,
+		CreatedAt:  time.Now(),
+		IsDir:      isDir,
+		IsTemplate: isTemplate,
 	}
 	result.Linked = append(result.Linked, entry)
 	s.manifest.Add(entry)
 
 	return nil
+}
+
+func (s *SymlinkLinker) hasTemplates(path string) bool {
+	content, err := os.ReadFile(path)
+	if err != nil {
+		return false
+	}
+	return template.HasPlaceholdersBytes(content)
+}
+
+func (s *SymlinkLinker) applyTemplate(source, target string, values map[string]string) error {
+	content, err := os.ReadFile(source)
+	if err != nil {
+		return err
+	}
+
+	processed := template.ApplyBytes(content, values)
+
+	info, err := os.Stat(source)
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(target, processed, info.Mode())
 }
 
 func (s *SymlinkLinker) Link(source, target string) error {
