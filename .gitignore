@@ -1,0 +1,39 @@
+# Binaries (only root binary, not cmd/dotts/ folder)
+/dotts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+/dist/
+
+# Test binary
+*.test
+
+# Output of go coverage
+*.out
+
+# Dependency directories
+vendor/
+
+# Go workspace file
+go.work
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local development
+.env
+.env.local
+
+# Build artifacts
+/bin/
+/build/
