@@ -1,6 +1,6 @@
 package app
 
-import "github.com/arthur404dev/dotts/internal/tui/messages"
+import "github.com/arthur404dev/dotts/pkg/vetru/messages"
 
 const (
 	PageDashboard messages.PageID = "dashboard"

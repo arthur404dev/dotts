@@ -1,12 +1,12 @@
 package wizard
 
 import (
-	"github.com/arthur404dev/dotts/internal/tui/components"
-	"github.com/arthur404dev/dotts/internal/tui/components/input"
-	"github.com/arthur404dev/dotts/internal/tui/keys"
+	"github.com/arthur404dev/dotts/pkg/vetru/components"
+	"github.com/arthur404dev/dotts/pkg/vetru/components/input"
+	"github.com/arthur404dev/dotts/pkg/vetru/keys"
 	"github.com/arthur404dev/dotts/internal/tui/app"
-	"github.com/arthur404dev/dotts/internal/tui/messages"
-	"github.com/arthur404dev/dotts/internal/tui/theme"
+	"github.com/arthur404dev/dotts/pkg/vetru/messages"
+	"github.com/arthur404dev/dotts/pkg/vetru/theme"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	zone "github.com/lrstanley/bubblezone"

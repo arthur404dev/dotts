@@ -6,7 +6,7 @@ import (
 	"github.com/arthur404dev/dotts/internal/config"
 	"github.com/arthur404dev/dotts/internal/state"
 	"github.com/arthur404dev/dotts/internal/system"
-	"github.com/arthur404dev/dotts/internal/tui/styles"
+	"github.com/arthur404dev/dotts/pkg/vetru/styles"
 	"github.com/arthur404dev/dotts/pkg/schema"
 )
 

@@ -5,7 +5,7 @@ import (
 
 	"github.com/charmbracelet/huh"
 
-	"github.com/arthur404dev/dotts/internal/tui/styles"
+	"github.com/arthur404dev/dotts/pkg/vetru/styles"
 )
 
 type AuthResult struct {

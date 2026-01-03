@@ -9,8 +9,8 @@ import (
 
 	"github.com/arthur404dev/dotts/internal/apply"
 	"github.com/arthur404dev/dotts/internal/state"
-	"github.com/arthur404dev/dotts/internal/tui/progress"
-	"github.com/arthur404dev/dotts/internal/tui/styles"
+	"github.com/arthur404dev/dotts/pkg/vetru/progress"
+	"github.com/arthur404dev/dotts/pkg/vetru/styles"
 	"github.com/arthur404dev/dotts/internal/tui/wizard"
 )
 

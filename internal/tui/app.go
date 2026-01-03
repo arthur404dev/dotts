@@ -3,16 +3,16 @@ package tui
 import (
 	"github.com/arthur404dev/dotts/internal/system"
 	"github.com/arthur404dev/dotts/internal/tui/app"
-	"github.com/arthur404dev/dotts/internal/tui/messages"
-	"github.com/arthur404dev/dotts/internal/tui/pages"
 	"github.com/arthur404dev/dotts/internal/tui/pages/dashboard"
 	"github.com/arthur404dev/dotts/internal/tui/pages/doctor"
 	"github.com/arthur404dev/dotts/internal/tui/pages/settings"
 	"github.com/arthur404dev/dotts/internal/tui/pages/status"
 	"github.com/arthur404dev/dotts/internal/tui/pages/update"
 	"github.com/arthur404dev/dotts/internal/tui/pages/wizard"
-	"github.com/arthur404dev/dotts/internal/tui/palette"
-	"github.com/arthur404dev/dotts/internal/tui/theme"
+	"github.com/arthur404dev/dotts/pkg/vetru"
+	"github.com/arthur404dev/dotts/pkg/vetru/messages"
+	"github.com/arthur404dev/dotts/pkg/vetru/palette"
+	"github.com/arthur404dev/dotts/pkg/vetru/theme"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -109,7 +109,7 @@ type systemDetectedMsg struct {
 func Run() error {
 	t := theme.DefaultTheme()
 
-	pageMap := map[messages.PageID]pages.Page{
+	pageMap := map[messages.PageID]vetru.Page{
 		app.PageDashboard: dashboard.New(t),
 		app.PageStatus:    status.New(t),
 		app.PageUpdate:    update.New(t),
@@ -118,7 +118,7 @@ func Run() error {
 		app.PageWizard:    wizard.New(t),
 	}
 
-	model := NewModel(Config{
+	model := vetru.NewModel(vetru.Config{
 		Brand:        "dotts",
 		Version:      Version,
 		Theme:        t,
@@ -140,7 +140,7 @@ func Run() error {
 }
 
 type appModel struct {
-	*Model
+	*vetru.Model
 }
 
 func (a *appModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -157,7 +157,7 @@ func (a *appModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	m, cmd := a.Model.Update(msg)
-	a.Model = m.(*Model)
+	a.Model = m.(*vetru.Model)
 	return a, cmd
 }
 

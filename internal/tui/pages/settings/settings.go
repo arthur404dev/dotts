@@ -3,8 +3,8 @@ package settings
 
 import (
 	"github.com/arthur404dev/dotts/internal/tui/app"
-	"github.com/arthur404dev/dotts/internal/tui/messages"
-	"github.com/arthur404dev/dotts/internal/tui/theme"
+	"github.com/arthur404dev/dotts/pkg/vetru/messages"
+	"github.com/arthur404dev/dotts/pkg/vetru/theme"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
