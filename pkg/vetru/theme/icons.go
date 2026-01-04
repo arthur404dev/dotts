@@ -3,11 +3,14 @@ package theme
 // Icons defines unicode symbols used throughout the TUI
 var Icons = struct {
 	// Navigation
-	Diagonal    string
-	ArrowRight  string
-	ArrowDown   string
-	Chevron     string
-	ChevronDown string
+	Diagonal     string
+	ArrowLeft    string
+	ArrowRight   string
+	ArrowDown    string
+	Chevron      string
+	ChevronLeft  string
+	ChevronRight string
+	ChevronDown  string
 
 	// Status
 	Success string
@@ -28,13 +31,20 @@ var Icons = struct {
 	Selected string
 	Bullet   string
 	Dot      string
+
+	// Files
+	Folder string
+	File   string
 }{
 	// Navigation
-	Diagonal:    "╱",
-	ArrowRight:  "→",
-	ArrowDown:   "↓",
-	Chevron:     "›",
-	ChevronDown: "⌄",
+	Diagonal:     "╱",
+	ArrowLeft:    "←",
+	ArrowRight:   "→",
+	ArrowDown:    "↓",
+	Chevron:      "›",
+	ChevronLeft:  "‹",
+	ChevronRight: "›",
+	ChevronDown:  "⌄",
 
 	// Status
 	Success: "✓",
@@ -55,4 +65,8 @@ var Icons = struct {
 	Selected: "▌",
 	Bullet:   "•",
 	Dot:      "·",
+
+	// Files
+	Folder: "📁",
+	File:   "📄",
 }

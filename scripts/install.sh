@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # dotts installer script
-# Usage: curl -fsSL https://dotts.sh/install.sh | bash
+# Usage: curl -fsSL https://dotts.4o4.sh/install.sh | bash
 #
 # Environment variables:
 #   DOTTS_VERSION   - Specific version to install (default: latest)
@@ -235,7 +235,7 @@ main() {
     printf "    ${CYAN}dotts init${NC}     # Bootstrap your dotfiles\n"
     printf "    ${CYAN}dotts --help${NC}   # Show available commands\n"
     echo ""
-    echo "  Documentation: https://dotts.sh"
+    echo "  Documentation: https://dotts.4o4.sh"
     echo ""
 }
 

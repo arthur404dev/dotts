@@ -8,7 +8,7 @@ import (
 
 var (
 	OpenPalette = key.NewBinding(
-		key.WithKeys("ctrl+p", "/"),
+		key.WithKeys("ctrl+p"),
 		key.WithHelp("ctrl+p", "commands"),
 	)
 
@@ -80,6 +80,16 @@ var (
 		key.WithKeys("right", "l"),
 		key.WithHelp("→/l", "next"),
 	)
+
+	StepPrev = key.NewBinding(
+		key.WithKeys("left"),
+		key.WithHelp("←", "prev step"),
+	)
+
+	StepNext = key.NewBinding(
+		key.WithKeys("right"),
+		key.WithHelp("→", "next step"),
+	)
 )
 
 var (
@@ -91,6 +101,28 @@ var (
 	PrevField = key.NewBinding(
 		key.WithKeys("shift+tab"),
 		key.WithHelp("shift+tab", "prev field"),
+	)
+)
+
+var (
+	ScrollUp = key.NewBinding(
+		key.WithKeys("pgup", "ctrl+u"),
+		key.WithHelp("pgup", "scroll up"),
+	)
+
+	ScrollDown = key.NewBinding(
+		key.WithKeys("pgdown", "ctrl+d"),
+		key.WithHelp("pgdn", "scroll down"),
+	)
+
+	ScrollTop = key.NewBinding(
+		key.WithKeys("home", "g"),
+		key.WithHelp("home", "scroll top"),
+	)
+
+	ScrollBottom = key.NewBinding(
+		key.WithKeys("end", "G"),
+		key.WithHelp("end", "scroll bottom"),
 	)
 )
 
@@ -132,4 +164,28 @@ func MatchesConfirm(msg tea.KeyMsg) bool {
 
 func MatchesEscape(msg tea.KeyMsg) bool {
 	return key.Matches(msg, Escape)
+}
+
+func MatchesStepPrev(msg tea.KeyMsg) bool {
+	return key.Matches(msg, StepPrev)
+}
+
+func MatchesStepNext(msg tea.KeyMsg) bool {
+	return key.Matches(msg, StepNext)
+}
+
+func MatchesScrollUp(msg tea.KeyMsg) bool {
+	return key.Matches(msg, ScrollUp)
+}
+
+func MatchesScrollDown(msg tea.KeyMsg) bool {
+	return key.Matches(msg, ScrollDown)
+}
+
+func MatchesScrollTop(msg tea.KeyMsg) bool {
+	return key.Matches(msg, ScrollTop)
+}
+
+func MatchesScrollBottom(msg tea.KeyMsg) bool {
+	return key.Matches(msg, ScrollBottom)
 }

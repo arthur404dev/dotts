@@ -1,22 +1,20 @@
-// Package settings provides the settings page
 package settings
 
 import (
 	"github.com/arthur404dev/dotts/internal/tui/app"
+	"github.com/arthur404dev/dotts/pkg/vetru/components"
 	"github.com/arthur404dev/dotts/pkg/vetru/messages"
 	"github.com/arthur404dev/dotts/pkg/vetru/theme"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
 
-// Settings is the settings page
 type Settings struct {
 	theme  *theme.Theme
 	width  int
 	height int
 }
 
-// New creates a new settings page
 func New(t *theme.Theme) *Settings {
 	return &Settings{theme: t}
 }
@@ -32,12 +30,14 @@ func (s *Settings) Update(msg tea.Msg) (tea.Model, tea.Cmd) { return s, nil }
 func (s *Settings) View() string {
 	t := s.theme
 	title := t.S().Title.Render("Settings")
-	content := t.S().Muted.Render("Coming soon...")
+	content := lipgloss.JoinVertical(lipgloss.Center,
+		title,
+		"",
+		t.S().Muted.Render("Coming soon..."),
+	)
 
-	container := lipgloss.NewStyle().
-		Width(s.width).
-		Height(s.height).
-		Padding(1, 2)
-
-	return container.Render(lipgloss.JoinVertical(lipgloss.Left, title, "", content))
+	return components.NewPageContainer(t).
+		SetSize(s.width, s.height).
+		SetContent(content).
+		View()
 }

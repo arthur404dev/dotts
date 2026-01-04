@@ -152,6 +152,9 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 
 		case key.Matches(msg, m.keymap.OpenPalette):
+			if m.currentPageCapturesKey(msg) {
+				break
+			}
 			if !m.paletteOpen {
 				m.paletteOpen = true
 				return m, m.palette.Focus()
@@ -266,6 +269,19 @@ func (m *Model) updateCurrentPage(msg tea.Msg) (*Model, tea.Cmd) {
 	m.pages[m.activePageID] = updated.(Page)
 
 	return m, cmd
+}
+
+func (m *Model) currentPageCapturesKey(msg tea.KeyMsg) bool {
+	page, ok := m.pages[m.activePageID]
+	if !ok {
+		return false
+	}
+
+	if captor, ok := page.(KeyCaptor); ok {
+		return captor.CapturesKey(msg)
+	}
+
+	return false
 }
 
 func (m *Model) updateLayout() {

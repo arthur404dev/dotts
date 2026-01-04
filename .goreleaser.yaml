@@ -1,0 +1,77 @@
+# GoReleaser configuration for dotts
+# Documentation: https://goreleaser.com
+
+version: 2
+
+project_name: dotts
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: dotts
+    main: ./cmd/dotts
+    binary: dotts
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X github.com/arthur404dev/dotts/cmd/dotts/cmd.Version={{.Version}}
+      - -X github.com/arthur404dev/dotts/cmd/dotts/cmd.BuildTime={{.Date}}
+
+archives:
+  - id: default
+    format: tar.gz
+    name_template: >-
+      {{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}
+    files:
+      - README.md
+      - LICENSE
+
+checksum:
+  name_template: "checksums.txt"
+  algorithm: sha256
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^ci:"
+      - "^chore:"
+      - Merge pull request
+      - Merge branch
+
+release:
+  github:
+    owner: arthur404dev
+    name: dotts
+  draft: false
+  prerelease: auto
+  name_template: "v{{.Version}}"
+  header: |
+    ## dotts v{{.Version}}
+    
+    Universal Dotfiles Manager - Beautiful CLI for managing dotfiles across multiple machines.
+    
+    ### Installation
+    
+    ```bash
+    curl -fsSL https://dotts.4o4.sh/install.sh | bash
+    ```
+    
+    Or download the appropriate binary below for your platform.
+
+announce:
+  skip: true

@@ -17,10 +17,8 @@
 ## Quick Start
 
 ```bash
-# Install (once releases are available)
-curl -fsSL https://dotts.sh/install.sh | bash
+curl -fsSL https://dotts.4o4.sh/install.sh | bash
 
-# Bootstrap your system
 dotts init
 ```
 
@@ -181,8 +179,8 @@ MIT License - see [LICENSE](LICENSE) file for details.
 - [x] TUI wizard (source, machine, settings, features, auth)
 - [x] Config repo template
 - [x] Install script
+- [x] Releases (goreleaser + GitHub Actions)
 - [ ] Package installation
 - [ ] Dotfile linking
 - [ ] Home Manager integration
 - [ ] Tests
-- [ ] Releases

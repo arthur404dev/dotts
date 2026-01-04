@@ -132,3 +132,46 @@ func ClearStatus() tea.Cmd {
 		return ClearStatusMsg{}
 	}
 }
+
+type SetupStartedMsg struct{}
+
+func SetupStarted() tea.Cmd {
+	return func() tea.Msg {
+		return SetupStartedMsg{}
+	}
+}
+
+type SetupProgressMsg struct {
+	Step    string
+	Message string
+}
+
+func SetupProgress(step, message string) tea.Cmd {
+	return func() tea.Msg {
+		return SetupProgressMsg{Step: step, Message: message}
+	}
+}
+
+type SetupCompleteMsg struct {
+	Success     bool
+	Error       error
+	ConfigPath  string
+	SymlinkPath string
+	BackupPath  string
+	ClonedFrom  string
+	CopiedFrom  string
+}
+
+func SetupComplete(success bool, err error, configPath, symlinkPath, backupPath, clonedFrom, copiedFrom string) tea.Cmd {
+	return func() tea.Msg {
+		return SetupCompleteMsg{
+			Success:     success,
+			Error:       err,
+			ConfigPath:  configPath,
+			SymlinkPath: symlinkPath,
+			BackupPath:  backupPath,
+			ClonedFrom:  clonedFrom,
+			CopiedFrom:  copiedFrom,
+		}
+	}
+}

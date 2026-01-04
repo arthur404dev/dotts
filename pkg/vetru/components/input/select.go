@@ -104,6 +104,10 @@ func (s *Select) Focused() bool {
 	return s.focused
 }
 
+func (s *Select) ZoneID() string {
+	return s.zoneID
+}
+
 func (s *Select) updateOffset() {
 	if s.cursor < s.offset {
 		s.offset = s.cursor

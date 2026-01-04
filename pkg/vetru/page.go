@@ -16,3 +16,7 @@ type Page interface {
 	Focus() tea.Cmd
 	Blur()
 }
+
+type KeyCaptor interface {
+	CapturesKey(msg tea.KeyMsg) bool
+}

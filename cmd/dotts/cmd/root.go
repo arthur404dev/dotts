@@ -37,7 +37,7 @@ Get started:
   dotts update        Update configs and packages
   dotts status        Show current state
 
-Documentation: https://dotts.sh/docs`,
+Documentation: https://dotts.4o4.sh/docs`,
 	Version: Version,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := tui.Run(); err != nil {

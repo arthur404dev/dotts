@@ -1,11 +1,13 @@
-// Package components provides reusable TUI components for the dotts application.
 package components
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/arthur404dev/dotts/pkg/vetru/theme"
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	zone "github.com/lrstanley/bubblezone"
 )
 
 // StepperStatus represents the state of a step in the stepper.
@@ -168,12 +170,23 @@ func (s *Stepper) getStatus(index int) StepperStatus {
 	return StepperPending
 }
 
-// View renders the stepper as a styled string.
-// The output displays steps horizontally with connectors between them:
-//
-//	Completed: ✓ Label (green)
-//	Current:   → Label (primary color, bold)
-//	Pending:   ○ Label (muted)
+func (s *Stepper) ZoneID(index int) string {
+	return fmt.Sprintf("stepper-step-%d", index)
+}
+
+func (s *Stepper) HandleClick(msg tea.MouseMsg) (clicked bool, stepIndex int) {
+	if msg.Action != tea.MouseActionRelease {
+		return false, -1
+	}
+
+	for i := range s.steps {
+		if i < s.current && zone.Get(s.ZoneID(i)).InBounds(msg) {
+			return true, i
+		}
+	}
+	return false, -1
+}
+
 func (s *Stepper) View() string {
 	if len(s.steps) == 0 {
 		return ""
@@ -207,6 +220,10 @@ func (s *Stepper) View() string {
 			stepView = style.Render(icon + " " + step.Label)
 		} else {
 			stepView = style.Render(icon)
+		}
+
+		if status == StepperComplete {
+			stepView = zone.Mark(s.ZoneID(i), stepView)
 		}
 
 		parts = append(parts, stepView)
