@@ -1,67 +1,42 @@
-#!/usr/bin/env bash
-# dotts installer script
-# Usage: curl -fsSL https://dotts.4o4.sh/install.sh | bash
-#
-# Environment variables:
-#   DOTTS_VERSION   - Specific version to install (default: latest)
-#   DOTTS_DIR       - Installation directory (default: ~/.local/bin)
-#   DOTTS_NO_MODIFY_PATH - If set, don't modify shell config to add to PATH
-
-set -euo pipefail
-
-# ══════════════════════════════════════════════════════════════════════════════
-# Configuration
-# ══════════════════════════════════════════════════════════════════════════════
+#!/bin/sh
+set -e
 
 DOTTS_REPO="arthur404dev/dotts"
 DOTTS_VERSION="${DOTTS_VERSION:-latest}"
 DOTTS_DIR="${DOTTS_DIR:-$HOME/.local/bin}"
 
-# Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
-BLUE='\033[0;34m'
-PURPLE='\033[0;35m'
 CYAN='\033[0;36m'
-NC='\033[0m' # No Color
-BOLD='\033[1m'
-
-# ══════════════════════════════════════════════════════════════════════════════
-# Helper functions
-# ══════════════════════════════════════════════════════════════════════════════
+NC='\033[0m'
 
 info() {
-    printf "${BLUE}[INFO]${NC} %s\n" "$1"
+    printf "%b[INFO]%b %s\n" "$CYAN" "$NC" "$1"
 }
 
 success() {
-    printf "${GREEN}[OK]${NC} %s\n" "$1"
-}
-
-warn() {
-    printf "${YELLOW}[WARN]${NC} %s\n" "$1"
+    printf "%b[OK]%b %s\n" "$GREEN" "$NC" "$1"
 }
 
 error() {
-    printf "${RED}[ERROR]${NC} %s\n" "$1" >&2
-}
-
-fatal() {
-    error "$1"
+    printf "%b[ERROR]%b %s\n" "$RED" "$NC" "$1" >&2
     exit 1
 }
 
-# ══════════════════════════════════════════════════════════════════════════════
-# System detection
-# ══════════════════════════════════════════════════════════════════════════════
+warn() {
+    printf "%b[WARN]%b %s\n" "$YELLOW" "$NC" "$1"
+}
+
+check_cmd() {
+    command -v "$1" >/dev/null 2>&1
+}
 
 detect_os() {
     case "$(uname -s)" in
         Linux*)  echo "linux" ;;
         Darwin*) echo "darwin" ;;
-        MINGW*|MSYS*|CYGWIN*) echo "windows" ;;
-        *)       fatal "Unsupported operating system: $(uname -s)" ;;
+        *)       error "Unsupported OS: $(uname -s)" ;;
     esac
 }
 
@@ -69,174 +44,115 @@ detect_arch() {
     case "$(uname -m)" in
         x86_64|amd64)  echo "amd64" ;;
         aarch64|arm64) echo "arm64" ;;
-        armv7l)        echo "arm" ;;
-        *)             fatal "Unsupported architecture: $(uname -m)" ;;
+        *)             error "Unsupported architecture: $(uname -m)" ;;
     esac
 }
 
-# Check for required commands
-check_requirements() {
-    local missing=()
-    
-    for cmd in curl tar; do
-        if ! command -v "$cmd" &> /dev/null; then
-            missing+=("$cmd")
-        fi
-    done
-    
-    if [[ ${#missing[@]} -gt 0 ]]; then
-        fatal "Missing required commands: ${missing[*]}"
-    fi
-}
-
-# ══════════════════════════════════════════════════════════════════════════════
-# Installation
-# ══════════════════════════════════════════════════════════════════════════════
-
 get_latest_version() {
-    curl -fsSL "https://api.github.com/repos/${DOTTS_REPO}/releases/latest" | \
+    curl -fsSL "https://api.github.com/repos/$DOTTS_REPO/releases/latest" | \
         grep '"tag_name":' | \
         sed -E 's/.*"([^"]+)".*/\1/'
 }
 
-download_and_install() {
-    local os="$1"
-    local arch="$2"
-    local version="$3"
-    
-    # Construct download URL
-    local filename="dotts_${version#v}_${os}_${arch}.tar.gz"
-    local url="https://github.com/${DOTTS_REPO}/releases/download/${version}/${filename}"
-    
-    info "Downloading dotts ${version} for ${os}/${arch}..."
-    
-    # Create temp directory
-    local tmpdir
-    tmpdir=$(mktemp -d)
-    trap "rm -rf ${tmpdir}" EXIT
-    
-    # Download
-    if ! curl -fsSL "$url" -o "${tmpdir}/dotts.tar.gz"; then
-        fatal "Failed to download from ${url}"
-    fi
-    
-    # Extract
-    info "Extracting..."
-    tar -xzf "${tmpdir}/dotts.tar.gz" -C "${tmpdir}"
-    
-    # Install
-    info "Installing to ${DOTTS_DIR}..."
-    mkdir -p "${DOTTS_DIR}"
-    
-    if [[ -f "${tmpdir}/dotts" ]]; then
-        mv "${tmpdir}/dotts" "${DOTTS_DIR}/dotts"
-        chmod +x "${DOTTS_DIR}/dotts"
-    else
-        fatal "Binary not found in archive"
-    fi
-    
-    success "dotts ${version} installed to ${DOTTS_DIR}/dotts"
-}
-
-# ══════════════════════════════════════════════════════════════════════════════
-# PATH configuration
-# ══════════════════════════════════════════════════════════════════════════════
-
-add_to_path() {
-    if [[ -n "${DOTTS_NO_MODIFY_PATH:-}" ]]; then
-        return
-    fi
-    
-    # Check if already in PATH
-    if [[ ":$PATH:" == *":${DOTTS_DIR}:"* ]]; then
-        return
-    fi
-    
-    local shell_config=""
-    local export_line="export PATH=\"${DOTTS_DIR}:\$PATH\""
-    
-    # Detect shell and config file
-    case "${SHELL:-}" in
-        */bash)
-            if [[ -f "$HOME/.bashrc" ]]; then
-                shell_config="$HOME/.bashrc"
-            elif [[ -f "$HOME/.bash_profile" ]]; then
-                shell_config="$HOME/.bash_profile"
-            fi
-            ;;
-        */zsh)
-            shell_config="$HOME/.zshrc"
-            ;;
-        */fish)
-            shell_config="$HOME/.config/fish/config.fish"
-            export_line="fish_add_path ${DOTTS_DIR}"
-            ;;
-    esac
-    
-    if [[ -n "$shell_config" ]]; then
-        if ! grep -q "${DOTTS_DIR}" "$shell_config" 2>/dev/null; then
-            info "Adding ${DOTTS_DIR} to PATH in ${shell_config}"
-            echo "" >> "$shell_config"
-            echo "# Added by dotts installer" >> "$shell_config"
-            echo "$export_line" >> "$shell_config"
-            warn "Restart your shell or run: source ${shell_config}"
-        fi
-    else
-        warn "Could not detect shell config. Add ${DOTTS_DIR} to your PATH manually."
-    fi
-}
-
-# ══════════════════════════════════════════════════════════════════════════════
-# Main
-# ══════════════════════════════════════════════════════════════════════════════
-
 main() {
     echo ""
-    printf "${PURPLE}${BOLD}"
+    printf "%b" "$CYAN"
     echo "  ╔═══════════════════════════════════════╗"
     echo "  ║           dotts installer             ║"
-    echo "  ║   Universal Dotfiles Manager          ║"
+    echo "  ║     Universal Dotfiles Manager        ║"
     echo "  ╚═══════════════════════════════════════╝"
-    printf "${NC}"
+    printf "%b" "$NC"
     echo ""
-    
-    # Check requirements
-    check_requirements
-    
-    # Detect system
-    local os arch
-    os=$(detect_os)
-    arch=$(detect_arch)
-    
-    info "Detected: ${os}/${arch}"
-    
-    # Get version
-    local version="$DOTTS_VERSION"
-    if [[ "$version" == "latest" ]]; then
+
+    if ! check_cmd curl; then
+        error "curl is required but not installed"
+    fi
+
+    if ! check_cmd tar; then
+        error "tar is required but not installed"
+    fi
+
+    OS=$(detect_os)
+    ARCH=$(detect_arch)
+    info "Detected: $OS/$ARCH"
+
+    VERSION="$DOTTS_VERSION"
+    if [ "$VERSION" = "latest" ]; then
         info "Fetching latest version..."
-        version=$(get_latest_version)
-        if [[ -z "$version" ]]; then
-            fatal "Could not determine latest version"
+        VERSION=$(get_latest_version)
+        if [ -z "$VERSION" ]; then
+            error "Could not determine latest version"
         fi
     fi
-    
-    info "Version: ${version}"
-    
-    # Download and install
-    download_and_install "$os" "$arch" "$version"
-    
-    # Add to PATH
-    add_to_path
-    
+    info "Version: $VERSION"
+
+    VERSION_NUM="${VERSION#v}"
+    FILENAME="dotts_${VERSION_NUM}_${OS}_${ARCH}.tar.gz"
+    URL="https://github.com/$DOTTS_REPO/releases/download/$VERSION/$FILENAME"
+
+    TMPDIR=$(mktemp -d)
+    trap 'rm -rf "$TMPDIR"' EXIT
+
+    info "Downloading..."
+    if ! curl -fsSL "$URL" -o "$TMPDIR/dotts.tar.gz"; then
+        error "Download failed: $URL"
+    fi
+
+    info "Extracting..."
+    tar -xzf "$TMPDIR/dotts.tar.gz" -C "$TMPDIR"
+
+    info "Installing to $DOTTS_DIR..."
+    mkdir -p "$DOTTS_DIR"
+
+    if [ -f "$TMPDIR/dotts" ]; then
+        mv "$TMPDIR/dotts" "$DOTTS_DIR/dotts"
+        chmod +x "$DOTTS_DIR/dotts"
+    else
+        error "Binary not found in archive"
+    fi
+
+    success "dotts $VERSION installed to $DOTTS_DIR/dotts"
+
+    if [ -z "${DOTTS_NO_MODIFY_PATH:-}" ]; then
+        case "$PATH" in
+            *"$DOTTS_DIR"*) ;;
+            *)
+                SHELL_NAME=$(basename "${SHELL:-sh}")
+                case "$SHELL_NAME" in
+                    bash)
+                        if [ -f "$HOME/.bashrc" ]; then
+                            SHELL_RC="$HOME/.bashrc"
+                        elif [ -f "$HOME/.bash_profile" ]; then
+                            SHELL_RC="$HOME/.bash_profile"
+                        fi
+                        ;;
+                    zsh)  SHELL_RC="$HOME/.zshrc" ;;
+                    fish) SHELL_RC="$HOME/.config/fish/config.fish" ;;
+                esac
+
+                if [ -n "${SHELL_RC:-}" ] && ! grep -q "$DOTTS_DIR" "$SHELL_RC" 2>/dev/null; then
+                    info "Adding $DOTTS_DIR to PATH in $SHELL_RC"
+                    echo "" >> "$SHELL_RC"
+                    if [ "$SHELL_NAME" = "fish" ]; then
+                        echo "fish_add_path $DOTTS_DIR" >> "$SHELL_RC"
+                    else
+                        echo "export PATH=\"$DOTTS_DIR:\$PATH\"" >> "$SHELL_RC"
+                    fi
+                    warn "Restart your shell or run: source $SHELL_RC"
+                fi
+                ;;
+        esac
+    fi
+
     echo ""
     success "Installation complete!"
     echo ""
     echo "  Get started:"
-    printf "    ${CYAN}dotts init${NC}     # Bootstrap your dotfiles\n"
-    printf "    ${CYAN}dotts --help${NC}   # Show available commands\n"
+    printf "    %bdotts init%b     - Bootstrap your dotfiles\n" "$CYAN" "$NC"
+    printf "    %bdotts --help%b   - Show available commands\n" "$CYAN" "$NC"
     echo ""
     echo "  Documentation: https://dotts.4o4.sh"
     echo ""
 }
 
-main "$@"
+main
