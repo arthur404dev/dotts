@@ -142,98 +142,42 @@ See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for detailed development guide.
 
 ## Releasing a New Version
 
-This guide walks through releasing a new version of dotts.
-
-### Prerequisites
-
-- All changes committed and pushed to `main`
-- Tests passing (when implemented)
-- Documentation updated in dotts-docs repo
-
-### Step-by-Step Release Process
-
-#### 1. Update Version References
-
-Update any hardcoded version references in the codebase if needed.
-
-#### 2. Create and Push a Git Tag
+### Quick Release
 
 ```bash
-# Create annotated tag
-git tag -a v0.2.0 -m "v0.2.0 - Brief description of release"
-
-# Push the tag
+# 1. Create and push tag
+git tag -a v0.2.0 -m "v0.2.0 - Description"
 git push origin v0.2.0
 ```
 
-#### 3. GitHub Actions Handles the Rest
-
-The `release.yaml` workflow automatically:
+That's it! GitHub Actions automatically:
 - Builds binaries for all platforms (linux/darwin × amd64/arm64)
-- Creates a GitHub Release with the binaries
+- Creates GitHub Release with all artifacts
 - Generates checksums
 
-#### 4. Verify the Release
-
-1. Check [GitHub Releases](https://github.com/arthur404dev/dotts/releases)
-2. Verify all 4 binaries are attached:
-   - `dotts_X.X.X_linux_amd64.tar.gz`
-   - `dotts_X.X.X_linux_arm64.tar.gz`
-   - `dotts_X.X.X_darwin_amd64.tar.gz`
-   - `dotts_X.X.X_darwin_arm64.tar.gz`
-
-#### 5. Test the Install Script
+### Verify Release
 
 ```bash
-# Test fresh install
+# Test install script pulls new version
 curl -fsSL https://dotts.4o4.sh/install.sh | sh
-
-# Verify version
 dotts --version
 ```
 
-#### 6. Update Documentation (dotts-docs repo)
+### Update Documentation
 
-If this is a new minor/major version with breaking changes or new features:
+For minor/major releases, also update [dotts-docs](https://github.com/arthur404dev/dotts-docs):
 
 ```bash
 cd ../dotts-docs
-
-# Archive previous version docs
-pnpm version:archive 0.1
-
-# Update docs for new version
-# ... edit content/docs/ ...
-
-# Commit and deploy
-git add .
-git commit -m "chore: release v0.2, archive v0.1 docs"
-git push
+pnpm version:archive 0.1  # Archive old version
+# Update docs content, then push
 ```
 
-See the [dotts-docs README](https://github.com/arthur404dev/dotts-docs#releasing-a-new-version) for detailed documentation versioning steps.
+### Versioning
 
-### Release Checklist
-
-- [ ] All changes committed to `main`
-- [ ] Version tag created and pushed
-- [ ] GitHub Release created automatically
-- [ ] All platform binaries attached to release
-- [ ] Install script tested with new version
-- [ ] Documentation updated (if needed)
-- [ ] Documentation archived (if new minor/major version)
-
-### Versioning Scheme
-
-dotts follows [Semantic Versioning](https://semver.org/):
-
-- **MAJOR** (v1.0.0 → v2.0.0): Breaking changes
-- **MINOR** (v0.1.0 → v0.2.0): New features, backward compatible
-- **PATCH** (v0.1.0 → v0.1.1): Bug fixes, backward compatible
-
-For documentation:
-- **Minor/Major** releases: Archive previous docs, create new version
-- **Patch** releases: Update existing docs in place
+- **Patch** (v0.1.1): Bug fixes - just tag and release
+- **Minor** (v0.2.0): New features - tag, release, archive docs
+- **Major** (v1.0.0): Breaking changes - tag, release, archive docs
 
 ## Documentation
 
